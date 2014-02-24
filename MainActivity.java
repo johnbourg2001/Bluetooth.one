@@ -53,11 +53,12 @@ public class MainActivity extends Activity implements OnItemClickListener {
 	
 	Handler mHandler = new Handler() {
 	
-		public void handleMessage(Message msg){
+		public void handleMessage(int flag, Message msg){
 			
+			// Maybe comment this guy out
 			super.handleMessage(msg);
 			
-			switch(msg.what){
+			switch(flag){
 				case SUCCESS_CONNECT:
 					// DO something
 					ConnectedThread connectedThread = new ConnectedThread((BluetoothSocket)msg.obj);
@@ -283,6 +284,7 @@ public class MainActivity extends Activity implements OnItemClickListener {
 	        
 	        // Do work to manage the connection (in a separate thread)
 	        Message completeMessage = mHandler.obtainMessage(SUCCESS_CONNECT, mmSocket);
+	        mHandler.handleMessage(SUCCESS_CONNECT, completeMessage);
 	        //Log.i("tag", "run" + completeMessage.toString());
 	        completeMessage.sendToTarget();
 	    }
@@ -338,7 +340,14 @@ public class MainActivity extends Activity implements OnItemClickListener {
 	               
 	                // Send the obtained bytes to the UI activity
 	                Message completedMessage = mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer);
+	                mHandler.handleMessage(MESSAGE_READ, completedMessage);
 	                //Log.i("tag", completedMessage.toString());
+	                
+	                /*
+	                
+	                mHanlder.handleMessage(MESSAGE_READ, bytes);
+	                
+	                */
 	                
 	                completedMessage.sendToTarget();
 	                
