@@ -23,7 +23,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -97,6 +96,8 @@ public class MainActivity extends Activity implements OnItemClickListener {
         listView.setOnItemClickListener(this);
         listAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, 0);
         listView.setAdapter(listAdapter);
+        dataView = (TextView)findViewById(R.id.dataView);
+        dataView.setText("hi");
         
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         pairedDevices = new ArrayList<String>();
@@ -220,20 +221,24 @@ public class MainActivity extends Activity implements OnItemClickListener {
     public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 
         Log.i(TAG, "In click Listener"); // Debug
-        dataView = (TextView)findViewById(R.id.dataView);
-        dataView.setText("hi");
-        activity_main.removeView(listView);
+       
         // TODO Auto-generated method stub
         BluetoothDevice selectedDevice = devices.get(arg2);
 
         if (btAdapter.isDiscovering()) {
             btAdapter.cancelDiscovery();
         }
-
+        /*
+        Intent intent = new Intent(this, ShowOtherScreen.class);
+        startActivity(intent);
+		*/
         // BluetoothDevice selectedDevice = devices.get(arg2);
         //Toast.makeText(getApplicationContext(), "Device is not paired", 0).show();
+        
         ConnectThread connect = new ConnectThread(selectedDevice, dataView, listView);
         connect.run();
+        
+  
         //String s = "Paired";
         //listAdapter.add(selectedDevice.getName()+" "+s+" "+"\n"+selectedDevice.getAddress());
     }
