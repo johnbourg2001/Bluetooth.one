@@ -1,12 +1,9 @@
-
 package com.example.finalblue;
-// package com.johnbourgeios.capstone;
 
 import java.io.IOException;
 import java.util.UUID;
 
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -19,12 +16,6 @@ public class ConnectThread extends Thread {
     private static final String TAG = "com.johnbourgeois.capstone";
     protected static final int SUCCESS_CONNECT = 0;
     protected static final int MESSAGE_READ = 1;
-    private TextView dataView;
-    private ListView listView;
-    private String inpt;
-    private EditText editText;
-   
-    
     
     // [todo] - Get actual UUID of each device rather than set to a static value
     // http://stackoverflow.com/questions/5088474/how-can-i-get-the-uuid-of-my-android-phone-in-an-application
@@ -36,17 +27,7 @@ public class ConnectThread extends Thread {
     /**
      * ConnectThread constructor
      */
-
-    
-    public ConnectThread(BluetoothDevice device, ListView lv, String input, TextView dV, EditText eT) {
-    	
-
-        // Use a temporary object that is later assigned to mmSocket,
-        // because mmSocket is final
-    	dataView = dV;
-    	editText = eT;
-        listView = lv;
-        inpt = input;
+    public ConnectThread(BluetoothDevice device) {
         BluetoothSocket tmp = null;
         mmDevice = device;
         Log.i(TAG, "In [ConnectThread] Constructor");
