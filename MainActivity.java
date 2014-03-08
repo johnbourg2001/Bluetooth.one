@@ -1,13 +1,14 @@
+package com.example.finalblue;
 
-package com.example.bluetooth;
-// package com.johnbourgeios.capstone;
-
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.UUID;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -22,13 +23,16 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
 public class MainActivity extends Activity implements OnItemClickListener {
     
     private static final String TAG = "com.johnbourgeois.capstone";
+
 
     // [todo] - Get actual UUID of each device rather than set to a static value
     // http://stackoverflow.com/questions/5088474/how-can-i-get-the-uuid-of-my-android-phone-in-an-application
@@ -37,10 +41,11 @@ public class MainActivity extends Activity implements OnItemClickListener {
     //private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     //private static final UUID MY_UUID = UUID.fromString("1234");
     
+    
+    private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     protected static final int SUCCESS_CONNECT = 0;
     protected static final int MESSAGE_READ = 1;
-
     
     ArrayAdapter<String> listAdapter;
     //Button connectNew;
@@ -53,51 +58,29 @@ public class MainActivity extends Activity implements OnItemClickListener {
     //ArrayList<BluetoothDevice>;
     IntentFilter filter;
     BroadcastReceiver receiver;
-
-    // Handler mHandler = new Handler() {
-    Handler mHandler = new Handler(Looper.getMainLooper()) {
-        // https://developer.android.com/training/multiple-threads/communicate-ui.html
-        // @Override <-- maybe?
-    	public void handleMessage(int flag, Message msg){
-            
-            // Run default handleMessage (if exists?)
-            super.handleMessage(msg);
-            
-            switch (flag) {
-                case SUCCESS_CONNECT:
-                    // [todo] - Double check that the bluetooth arg is actual of type "Bluetooth socket"
-                    //ConnectedThread connectedThread = new ConnectedThread((BluetoothSocket)msg.obj, dataView);
-                    Toast.makeText(getApplicationContext(), "Connected", 0).show();
-                    String s = "Succesful connected";
-                    Log.i(TAG, s);
-                    //connectedThread.write(s.getBytes());
-                    break;
-                    
-            
-                case MESSAGE_READ:
-                    byte[] readBuf = (byte[])msg.obj;
-                    String string = new String(readBuf);
-                    Toast.makeText(getApplicationContext(), string, 0).show();
-                    Log.i(TAG, string);
-                    break;
-            }
-        }
-        
-    };
+    EditText editText;
+    
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
+       	 
+        
+        
         // TODO Auto-generated method stub
         // connectNew=(Button)findViewById(R.id.bConnectNew);
-        listView = (ListView)findViewById(R.id.listView);
+        listView = (ListView)findViewById(R.id.listView1);
+        dataView = (TextView)findViewById(R.id.dV);
         listView.setOnItemClickListener(this);
         listAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, 0);
         listView.setAdapter(listAdapter);
-        dataView = (TextView)findViewById(R.id.dataView);
-        dataView.setText("hi");
+        editText = (EditText) findViewById(R.id.userInput);
+        EditText editText = (EditText) findViewById(R.id.userInput);
+    	//String input = editText.getText().toString();
+        //dataView = (TextView)findViewById(R.id.dataView);
+        
         
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         pairedDevices = new ArrayList<String>();
@@ -191,7 +174,16 @@ public class MainActivity extends Activity implements OnItemClickListener {
         Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         startActivityForResult(intent, 1);
     }
+    
+    private String ButtonHit(){
+    	EditText editText = (EditText) findViewById(R.id.userInput);
+    	String input = editText.getText().toString();
+    	
+    	return(input);
+    	
+    }
 
+    
     private void getPairedDevices() {
         // TODO Auto-generated method stub
         devicesArray = btAdapter.getBondedDevices();
@@ -216,6 +208,7 @@ public class MainActivity extends Activity implements OnItemClickListener {
             finish();
         }
     }
+    
 
     @Override
     public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
@@ -228,18 +221,14 @@ public class MainActivity extends Activity implements OnItemClickListener {
         if (btAdapter.isDiscovering()) {
             btAdapter.cancelDiscovery();
         }
-        /*
-        Intent intent = new Intent(this, ShowOtherScreen.class);
-        startActivity(intent);
-		*/
-        // BluetoothDevice selectedDevice = devices.get(arg2);
-        //Toast.makeText(getApplicationContext(), "Device is not paired", 0).show();
-        
-        ConnectThread connect = new ConnectThread(selectedDevice, dataView, listView);
-        connect.run();
-        
-  
-        //String s = "Paired";
-        //listAdapter.add(selectedDevice.getName()+" "+s+" "+"\n"+selectedDevice.getAddress());
+      
+    	String input = editText.getText().toString();
+            
+        dataView.setText("Response: ");
+
+        //for (int i = 0; i < 5; i++) {
+        	ConnectThread connect = new ConnectThread(selectedDevice, dataView, input);
+        	connect.run(); 
+        //}
     }
 }

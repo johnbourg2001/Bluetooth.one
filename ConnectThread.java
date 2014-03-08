@@ -19,46 +19,31 @@ public class ConnectThread extends Thread {
     private static final String TAG = "com.johnbourgeois.capstone";
     protected static final int SUCCESS_CONNECT = 0;
     protected static final int MESSAGE_READ = 1;
-    private TextView dataView;
-    private ListView listView;
-    private String inpt;
-    private EditText editText;
-   
-    
-    
-    // [todo] - Get actual UUID of each device rather than set to a static value
-    // http://stackoverflow.com/questions/5088474/how-can-i-get-the-uuid-of-my-android-phone-in-an-application
-//    TelephonyManager tManager = (TelephonyManager)getApplicationContext.getSystemService(Context.TELEPHONY_SERVICE);
-//    String uuid = tManager.getDeviceId();
+    TextView tv;
+    String ms;
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-    //private static final UUID MY_UUID = UUID.fromString("1234");
     
     /**
      * ConnectThread constructor
      */
 
     
-    public ConnectThread(BluetoothDevice device, ListView lv, String input, TextView dV, EditText eT) {
+    public ConnectThread(BluetoothDevice device, TextView ntv, String message) {
     	
-
-        // Use a temporary object that is later assigned to mmSocket,
-        // because mmSocket is final
-    	dataView = dV;
-    	editText = eT;
-        listView = lv;
-        inpt = input;
-        BluetoothSocket tmp = null;
+    	ms = message;
+    	tv = ntv;
         mmDevice = device;
+        BluetoothSocket tmp = null;
+        
         Log.i(TAG, "In [ConnectThread] Constructor");
 
-        // Get a BluetoothSocket to connect with the given BluetoothDevice
         try {
-            // MY_UUID is the app's UUID string, also used by the server code
-            tmp = device.createRfcommSocketToServiceRecord(MY_UUID);
+        	tmp = device.createRfcommSocketToServiceRecord(MY_UUID);
             Log.i(TAG, "In [ConnectThread] constructor's try state");
         } catch (IOException e) {
             Log.e(TAG, e.toString());
         }
+        
         mmSocket = tmp;
     }
 
@@ -72,31 +57,32 @@ public class ConnectThread extends Thread {
         Log.i(TAG, "In [ConnectThread] Run()");
         
         try {
-            // Connect the device through the socket. This will block
-            // until it succeeds or throws an exception
             mmSocket.connect();
-            
-            ConnectedThread cdt = new ConnectedThread(mmSocket, listView, inpt, dataView, editText);
-            cdt.run();
+            Log.i(TAG, "Socket connected.");
             
         } catch (IOException connectException) {
             Log.e(TAG, connectException.toString());
 
-            // Unable to connect
-            // Lose the socket and get out
             try {
                 mmSocket.close();
+                Log.i(TAG, "Socket closed.");
             } catch (IOException e) {
                 Log.e(TAG, e.toString());
             }
+            
             return;
         }
         
-        // Do work to manage the connection (in a separate thread)
-//        Handler mHandler = new Handler(Looper.getMainLooper());
-//        Message completeMessage = mHandler.obtainMessage(SUCCESS_CONNECT, mmSocket);
-//        Log.i(TAG, "run" + completeMessage.toString());
-        //completeMessage.sendToTarget();
+        
+
+        for (int i = 0; i < 5; i++) {
+        	ConnectedThread cdt = new ConnectedThread(mmSocket, tv, ms);
+        	Log.i(TAG,"in for");
+        	cdt.run();
+        }
+        cancel();
+        
+        
     }
 
     /**
